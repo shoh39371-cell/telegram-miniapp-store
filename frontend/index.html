@@ -2,13 +2,9 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-    >
-
-    <title>PHOENIX DONAT SHOP</title>
+    <title>YAKURA DONAT SHOP</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -23,26 +19,17 @@
     <header class="header">
 
         <div class="brand">
-
-            <div class="brand-icon">
-                🔥
-            </div>
+            <div class="brand-icon">Y</div>
 
             <div>
-                <div class="brand-name">
-                    PHOENIX
-                </div>
-
-                <div class="brand-sub">
-                    DONAT SHOP
-                </div>
+                <div class="brand-name">YAKURA</div>
+                <div class="brand-sub">DONAT SHOP</div>
             </div>
-
         </div>
 
-        <div class="profile-button" id="profileButton">
+        <button class="profile-button" id="profileButton">
             👤
-        </div>
+        </button>
 
     </header>
 
@@ -89,7 +76,7 @@
     </section>
 
 
-    <!-- TITLE -->
+    <!-- GAMES -->
     <div class="section-title">
 
         <div>
@@ -103,12 +90,19 @@
     </div>
 
 
-    <!-- GAMES -->
-    <main id="gamesContainer" class="games-grid">
+    <main
+        id="gamesContainer"
+        class="games-grid"
+    >
 
         <div class="loading-card">
+
             <div class="loader"></div>
-            <span>O'yinlar yuklanmoqda...</span>
+
+            <span>
+                O'yinlar yuklanmoqda...
+            </span>
+
         </div>
 
     </main>
@@ -118,7 +112,9 @@
     <section class="quick-section">
 
         <div class="section-title">
-            <div>⚡ Tezkor</div>
+            <div>
+                ⚡ Tezkor
+            </div>
         </div>
 
 
@@ -128,14 +124,21 @@
                 class="quick-card"
                 id="ordersButton"
             >
+
                 <div class="quick-icon">
                     📦
                 </div>
 
                 <div>
-                    <strong>Buyurtmalarim</strong>
-                    <small>Buyurtmalar tarixi</small>
+                    <strong>
+                        Buyurtmalarim
+                    </strong>
+
+                    <small>
+                        Buyurtmalar tarixi
+                    </small>
                 </div>
+
             </button>
 
 
@@ -143,14 +146,21 @@
                 class="quick-card"
                 id="promoButton"
             >
+
                 <div class="quick-icon">
                     🎁
                 </div>
 
                 <div>
-                    <strong>Promokod</strong>
-                    <small>Bonus olish</small>
+                    <strong>
+                        Promokod
+                    </strong>
+
+                    <small>
+                        Bonus olish
+                    </small>
                 </div>
+
             </button>
 
 
@@ -158,14 +168,21 @@
                 class="quick-card"
                 id="supportButton"
             >
+
                 <div class="quick-icon">
                     💬
                 </div>
 
                 <div>
-                    <strong>Support</strong>
-                    <small>Yordam markazi</small>
+                    <strong>
+                        Support
+                    </strong>
+
+                    <small>
+                        Yordam markazi
+                    </small>
                 </div>
+
             </button>
 
 
@@ -173,14 +190,21 @@
                 class="quick-card"
                 id="profileMenuButton"
             >
+
                 <div class="quick-icon">
                     👤
                 </div>
 
                 <div>
-                    <strong>Profil</strong>
-                    <small>Hisob ma'lumotlari</small>
+                    <strong>
+                        Profil
+                    </strong>
+
+                    <small>
+                        Hisob ma'lumotlari
+                    </small>
                 </div>
+
             </button>
 
         </div>
@@ -188,12 +212,11 @@
     </section>
 
 
-    <!-- EMPTY / ERROR -->
+    <!-- ERROR -->
     <div
         id="errorBox"
         class="error-box hidden"
-    >
-    </div>
+    ></div>
 
 
     <!-- BOTTOM NAV -->
@@ -203,8 +226,13 @@
             class="nav-item active"
             id="homeNav"
         >
+
             <span>🏠</span>
-            <small>Bosh sahifa</small>
+
+            <small>
+                Bosh sahifa
+            </small>
+
         </button>
 
 
@@ -212,8 +240,13 @@
             class="nav-item"
             id="ordersNav"
         >
+
             <span>📦</span>
-            <small>Buyurtmalar</small>
+
+            <small>
+                Buyurtmalar
+            </small>
+
         </button>
 
 
@@ -221,8 +254,13 @@
             class="nav-item"
             id="balanceNav"
         >
+
             <span>💰</span>
-            <small>Balans</small>
+
+            <small>
+                Balans
+            </small>
+
         </button>
 
 
@@ -230,13 +268,19 @@
             class="nav-item"
             id="profileNav"
         >
+
             <span>👤</span>
-            <small>Profil</small>
+
+            <small>
+                Profil
+            </small>
+
         </button>
 
     </nav>
 
 </div>
+
 
 
 <!-- GAME MODAL -->
@@ -246,6 +290,7 @@
 >
 
     <div class="modal-backdrop"></div>
+
 
     <div class="modal-sheet">
 
@@ -276,7 +321,7 @@
 
 
         <!-- PLAYER ID -->
-        <label>
+        <label for="playerId">
             Player ID
         </label>
 
@@ -292,7 +337,7 @@
         <!-- SERVER ID -->
         <div id="serverField">
 
-            <label>
+            <label for="serverId">
                 Server ID
             </label>
 
@@ -307,6 +352,7 @@
         </div>
 
 
+        <!-- CHECK -->
         <button
             id="checkPlayerButton"
             class="primary-button"
@@ -315,11 +361,11 @@
         </button>
 
 
+        <!-- PLAYER RESULT -->
         <div
             id="playerResult"
             class="player-result hidden"
-        >
-        </div>
+        ></div>
 
 
         <!-- PACKAGES -->
@@ -335,7 +381,6 @@
             <div id="packagesList"></div>
 
         </div>
-
 
     </div>
 
