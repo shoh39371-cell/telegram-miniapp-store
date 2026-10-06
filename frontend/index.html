@@ -1,81 +1,348 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Digital Store</title>
-    <link rel="stylesheet" href="style.css" />
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    >
+
+    <title>PHOENIX DONAT SHOP</title>
+
+    <link rel="stylesheet" href="style.css">
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  </head>
-  <body>
-    <div class="wrap">
-      <div class="topbar">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+
         <div class="brand">
-          <div class="title">Digital Store</div>
-          <div class="sub">Fast checkout inside Telegram</div>
-        </div>
-        <div class="row">
-          <div class="pill" id="pillUser">...</div>
-        </div>
-      </div>
 
-      <div class="grid">
-        <div class="card">
-          <div class="cardBody">
-            <label for="searchInput">Search</label>
-            <input id="searchInput" placeholder="Search products, games, amounts..." />
-            <div style="height: 8px"></div>
-            <div class="notice" id="searchHint">Tip: try “Netflix”, “Mobile Legends”, “60 Diamonds”.</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="cardHeader">
-            <h2>Products</h2>
-            <div class="hint">Scroll →</div>
-          </div>
-          <div class="cardBody">
-            <div class="scrollRow" id="productsRow"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="cardHeader">
-            <h2>Game Currency</h2>
-            <div class="hint">Choose game</div>
-          </div>
-          <div class="cardBody">
-            <div class="row rowWrap">
-              <div class="col">
-                <label for="gameSelect">Game</label>
-                <select id="gameSelect"></select>
-              </div>
-              <div class="col">
-                <label>API</label>
-                <div class="pill" id="pillApi">...</div>
-              </div>
+            <div class="brand-icon">
+                🔥
             </div>
-            <div class="divider"></div>
-            <div class="scrollRow" id="gameRow"></div>
-          </div>
+
+            <div>
+                <div class="brand-name">
+                    PHOENIX
+                </div>
+
+                <div class="brand-sub">
+                    DONAT SHOP
+                </div>
+            </div>
+
         </div>
 
-        <div class="notice">
-          <strong>Payment methods:</strong> KBZPay, WavePay, AyaPay.
-          Enter the last 6 digits of your transaction on checkout.
+        <div class="profile-button" id="profileButton">
+            👤
         </div>
 
-        <div class="footer">Powered by Supabase + Express + Telegram Bot</div>
-      </div>
+    </header>
+
+
+    <!-- BALANCE -->
+    <section class="balance-card">
+
+        <div class="balance-left">
+
+            <div class="balance-label">
+                Balansingiz
+            </div>
+
+            <div class="balance-value">
+                0 so'm
+            </div>
+
+        </div>
+
+        <button
+            class="balance-button"
+            id="balanceButton"
+        >
+            + To'ldirish
+        </button>
+
+    </section>
+
+
+    <!-- SEARCH -->
+    <section class="search-box">
+
+        <span class="search-icon">
+            🔎
+        </span>
+
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="O'yin qidirish..."
+            autocomplete="off"
+        >
+
+    </section>
+
+
+    <!-- TITLE -->
+    <div class="section-title">
+
+        <div>
+            🎮 O'yinlar
+        </div>
+
+        <span>
+            Barchasi
+        </span>
+
     </div>
 
-    <script src="app.js"></script>
-    <script>
-      window.App.initIndex().catch((e) => {
-        document.getElementById("productsRow").innerHTML =
-          `<div class="notice"><strong>Error:</strong> ${String(e.message || e)}</div>`;
-      });
-    </script>
-  </body>
-</html>
 
+    <!-- GAMES -->
+    <main id="gamesContainer" class="games-grid">
+
+        <div class="loading-card">
+            <div class="loader"></div>
+            <span>O'yinlar yuklanmoqda...</span>
+        </div>
+
+    </main>
+
+
+    <!-- QUICK MENU -->
+    <section class="quick-section">
+
+        <div class="section-title">
+            <div>⚡ Tezkor</div>
+        </div>
+
+
+        <div class="quick-grid">
+
+            <button
+                class="quick-card"
+                id="ordersButton"
+            >
+                <div class="quick-icon">
+                    📦
+                </div>
+
+                <div>
+                    <strong>Buyurtmalarim</strong>
+                    <small>Buyurtmalar tarixi</small>
+                </div>
+            </button>
+
+
+            <button
+                class="quick-card"
+                id="promoButton"
+            >
+                <div class="quick-icon">
+                    🎁
+                </div>
+
+                <div>
+                    <strong>Promokod</strong>
+                    <small>Bonus olish</small>
+                </div>
+            </button>
+
+
+            <button
+                class="quick-card"
+                id="supportButton"
+            >
+                <div class="quick-icon">
+                    💬
+                </div>
+
+                <div>
+                    <strong>Support</strong>
+                    <small>Yordam markazi</small>
+                </div>
+            </button>
+
+
+            <button
+                class="quick-card"
+                id="profileMenuButton"
+            >
+                <div class="quick-icon">
+                    👤
+                </div>
+
+                <div>
+                    <strong>Profil</strong>
+                    <small>Hisob ma'lumotlari</small>
+                </div>
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- EMPTY / ERROR -->
+    <div
+        id="errorBox"
+        class="error-box hidden"
+    >
+    </div>
+
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+
+        <button
+            class="nav-item active"
+            id="homeNav"
+        >
+            <span>🏠</span>
+            <small>Bosh sahifa</small>
+        </button>
+
+
+        <button
+            class="nav-item"
+            id="ordersNav"
+        >
+            <span>📦</span>
+            <small>Buyurtmalar</small>
+        </button>
+
+
+        <button
+            class="nav-item"
+            id="balanceNav"
+        >
+            <span>💰</span>
+            <small>Balans</small>
+        </button>
+
+
+        <button
+            class="nav-item"
+            id="profileNav"
+        >
+            <span>👤</span>
+            <small>Profil</small>
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- GAME MODAL -->
+<div
+    id="gameModal"
+    class="modal hidden"
+>
+
+    <div class="modal-backdrop"></div>
+
+    <div class="modal-sheet">
+
+        <button
+            class="modal-close"
+            id="closeGameModal"
+        >
+            ×
+        </button>
+
+
+        <div
+            id="selectedGameIcon"
+            class="modal-game-icon"
+        >
+            🎮
+        </div>
+
+
+        <h2 id="selectedGameName">
+            O'yin
+        </h2>
+
+
+        <p class="modal-description">
+            Donat qilish uchun ma'lumotlarni kiriting.
+        </p>
+
+
+        <!-- PLAYER ID -->
+        <label>
+            Player ID
+        </label>
+
+        <input
+            id="playerId"
+            class="form-input"
+            type="text"
+            placeholder="Player ID"
+            autocomplete="off"
+        >
+
+
+        <!-- SERVER ID -->
+        <div id="serverField">
+
+            <label>
+                Server ID
+            </label>
+
+            <input
+                id="serverId"
+                class="form-input"
+                type="text"
+                placeholder="Server ID"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <button
+            id="checkPlayerButton"
+            class="primary-button"
+        >
+            🔎 Akkauntni tekshirish
+        </button>
+
+
+        <div
+            id="playerResult"
+            class="player-result hidden"
+        >
+        </div>
+
+
+        <!-- PACKAGES -->
+        <div
+            id="packagesContainer"
+            class="packages-container hidden"
+        >
+
+            <div class="package-title">
+                💎 Paketni tanlang
+            </div>
+
+            <div id="packagesList"></div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
