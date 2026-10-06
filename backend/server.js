@@ -8,18 +8,23 @@ import rateLimit from "express-rate-limit";
 import { productsRouter } from "./routes/products.js";
 import { gameOptionsRouter } from "./routes/game-options.js";
 import { orderRouter } from "./routes/order.js";
+import { yakuraRouter } from "./routes/yakura.js";
 
 const app = express();
 
 app.set("trust proxy", 1);
 
 app.use(helmet());
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN ? [process.env.FRONTEND_ORIGIN] : true,
+    origin: process.env.FRONTEND_ORIGIN
+      ? [process.env.FRONTEND_ORIGIN]
+      : true,
     methods: ["GET", "POST", "OPTIONS"],
   })
 );
+
 app.use(express.json({ limit: "200kb" }));
 app.use(morgan("tiny"));
 
@@ -33,18 +38,67 @@ app.use(
   })
 );
 
-app.get("/health", (_req, res) => res.json({ ok: true }));
+/*
+|--------------------------------------------------------------------------
+| HEALTH
+|--------------------------------------------------------------------------
+*/
+
+app.get("/health", (_req, res) => {
+  res.json({
+    ok: true,
+    service: "YAKURA DONAT SHOP API",
+  });
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| OLD SOURCE ROUTES
+|--------------------------------------------------------------------------
+*/
+
 app.use("/api/products", productsRouter);
 app.use("/api/game-options", gameOptionsRouter);
 app.use("/api/order", orderRouter);
 
+
+/*
+|--------------------------------------------------------------------------
+| YAKURA MINI APP API
+|--------------------------------------------------------------------------
+*/
+
+app.use("/api", yakuraRouter);
+
+
+/*
+|--------------------------------------------------------------------------
+| ERROR HANDLER
+|--------------------------------------------------------------------------
+*/
+
 app.use((err, _req, res, _next) => {
   console.error(err);
-  res.status(500).json({ error: "Internal server error" });
+
+  res.status(500).json({
+    error: "Internal server error",
+  });
 });
 
-const port = Number(process.env.PORT || 3000);
+
+/*
+|--------------------------------------------------------------------------
+| SERVER
+|--------------------------------------------------------------------------
+*/
+
+const port = Number(
+  process.env.PORT || 3000
+);
+
 app.listen(port, () => {
-  console.log(`API listening on :${port}`);
+  console.log(
+    `YAKURA API listening on :${port}`
+  );
 });
-
