@@ -523,56 +523,60 @@ yakuraRouter.get("/playpay-balance", async (_req, res) => {
 yakuraRouter.get("/my-orders/:telegramId", async (req, res) => {
     try {
         const telegramId = String(
-            req.params.telegramId
-        );
+            req.params.telegramId || ""
+        ).trim();
 
         if (!telegramId) {
             return res.status(400).json({
+                success: false,
                 error: "telegramId kerak"
             });
         }
 
-        const { data: orders, error } = await supabase
+        const { data, error } = await supabase
             .from("orders")
-            .select(`
-                id,
-                telegram_id,
-                product_name,
-                amount,
-                price,
-                status,
-                created_at
-            `)
-            .eq("telegram_id", telegramId)
-            .order("created_at", {
-                ascending: false
-            });
+            .select("*")
+            .eq("telegram_id", telegramId);
 
         if (error) {
             console.error(
-                "My orders DB error:",
-                error.message
+                "MY ORDERS SUPABASE ERROR:",
+                error
             );
 
             return res.status(500).json({
-                error: "Buyurtmalarni yuklab bo'lmadi"
+                success: false,
+                error: "Buyurtmalarni yuklab bo'lmadi",
+                details: error.message
             });
         }
 
+        const orders = Array.isArray(data)
+            ? data
+            : [];
+
+        orders.sort((a, b) => {
+            return (
+                new Date(b.created_at || 0) -
+                new Date(a.created_at || 0)
+            );
+        });
+
         return res.json({
             success: true,
-            orders: orders || []
+            orders: orders
         });
 
     } catch (error) {
-
         console.error(
-            "My orders error:",
-            error.message
+            "MY ORDERS ERROR:",
+            error
         );
 
         return res.status(500).json({
-            error: "Buyurtmalarni yuklab bo'lmadi"
+            success: false,
+            error: "Buyurtmalarni yuklab bo'lmadi",
+            details: error.message
         });
     }
 });
