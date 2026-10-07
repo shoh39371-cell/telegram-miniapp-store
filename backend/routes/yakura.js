@@ -514,3 +514,65 @@ yakuraRouter.get("/playpay-balance", async (_req, res) => {
         });
     }
 });
+/*
+|--------------------------------------------------------------------------
+| MENING BUYURTMALARIM
+|--------------------------------------------------------------------------
+*/
+
+yakuraRouter.get("/my-orders/:telegramId", async (req, res) => {
+    try {
+        const telegramId = String(
+            req.params.telegramId
+        );
+
+        if (!telegramId) {
+            return res.status(400).json({
+                error: "telegramId kerak"
+            });
+        }
+
+        const { data: orders, error } = await supabase
+            .from("orders")
+            .select(`
+                id,
+                telegram_id,
+                product_name,
+                amount,
+                price,
+                status,
+                created_at
+            `)
+            .eq("telegram_id", telegramId)
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) {
+            console.error(
+                "My orders DB error:",
+                error.message
+            );
+
+            return res.status(500).json({
+                error: "Buyurtmalarni yuklab bo'lmadi"
+            });
+        }
+
+        return res.json({
+            success: true,
+            orders: orders || []
+        });
+
+    } catch (error) {
+
+        console.error(
+            "My orders error:",
+            error.message
+        );
+
+        return res.status(500).json({
+            error: "Buyurtmalarni yuklab bo'lmadi"
+        });
+    }
+});
