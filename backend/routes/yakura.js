@@ -15,6 +15,7 @@ async function playpay(path, options = {}) {
     const response = await fetch(`${PLAYPAY_URL}${path}`, {
         ...options,
         headers: {
+            Accept: "application/json",
             "Content-Type": "application/json",
             "X-API-Key": key,
             ...(options.headers || {})
@@ -25,8 +26,8 @@ async function playpay(path, options = {}) {
 
     if (!response.ok) {
         throw new Error(
-            data?.message ||
             data?.error ||
+            data?.message ||
             `PlayPay error: ${response.status}`
         );
     }
@@ -37,7 +38,7 @@ async function playpay(path, options = {}) {
 
 /*
 |--------------------------------------------------------------------------
-| O'YINLAR
+| O'YINLAR — PLAYPAY'DAN BARCHASI
 |--------------------------------------------------------------------------
 */
 
@@ -45,18 +46,41 @@ yakuraRouter.get("/games", async (_req, res) => {
     try {
         const data = await playpay("/games");
 
-        const games =
-            data?.games ||
-            data?.data ||
-            (Array.isArray(data) ? data : []);
+        const games = Array.isArray(data?.games)
+            ? data.games
+            : Array.isArray(data)
+                ? data
+                : [];
 
-        return res.json(games);
+        const result = games.map((game) => ({
+            id: game.game_id,
+            game_id: game.game_id,
+
+            name: game.name,
+            title: game.name,
+            game_name: game.name,
+
+            id_label: game.id_label || "Player ID",
+
+            requires_server: Boolean(game.requires_server),
+            requires_charname: Boolean(game.requires_charname),
+
+            amount_based: Boolean(game.amount_based),
+            packages_count: Number(game.packages_count || 0),
+
+            // Frontend uchun fallback
+            image_url: game.image_url || "",
+            icon: game.icon || ""
+        }));
+
+        return res.json(result);
 
     } catch (error) {
         console.error("Games error:", error.message);
 
         return res.status(500).json({
-            error: "O'yinlarni yuklab bo'lmadi"
+            error: "O'yinlarni yuklab bo'lmadi",
+            details: error.message
         });
     }
 });
@@ -70,22 +94,52 @@ yakuraRouter.get("/games", async (_req, res) => {
 
 yakuraRouter.get("/games/:gameId/packages", async (req, res) => {
     try {
+        const gameId = Number(req.params.gameId);
+
+        if (!Number.isInteger(gameId)) {
+            return res.status(400).json({
+                error: "Noto'g'ri game ID"
+            });
+        }
+
         const data = await playpay(
-            `/games/${encodeURIComponent(req.params.gameId)}/packages`
+            `/games/${encodeURIComponent(gameId)}/packages?currency=UZS`
         );
 
-        const packages =
-            data?.packages ||
-            data?.data ||
-            (Array.isArray(data) ? data : []);
+        const packages = Array.isArray(data?.packages)
+            ? data.packages
+            : Array.isArray(data)
+                ? data
+                : [];
 
-        return res.json(packages);
+        const result = packages.map((item) => ({
+            id: item.paket_id,
+            paket_id: item.paket_id,
+
+            name: item.name,
+
+            price:
+                item?.price?.amount ??
+                item?.price ??
+                0,
+
+            charged:
+                item?.charged?.amount ??
+                0,
+
+            currency:
+                item?.price?.currency ||
+                "UZS"
+        }));
+
+        return res.json(result);
 
     } catch (error) {
         console.error("Packages error:", error.message);
 
         return res.status(500).json({
-            error: "Paketlarni yuklab bo'lmadi"
+            error: "Paketlarni yuklab bo'lmadi",
+            details: error.message
         });
     }
 });
@@ -102,17 +156,20 @@ yakuraRouter.post("/check-player", async (req, res) => {
         const {
             game_id,
             player_id,
-            server_id
+            server_id,
+            charname
         } = req.body || {};
 
         if (!game_id) {
             return res.status(400).json({
+                success: false,
                 error: "game_id kerak"
             });
         }
 
         if (!player_id) {
             return res.status(400).json({
+                success: false,
                 error: "player_id kerak"
             });
         }
@@ -126,19 +183,34 @@ yakuraRouter.post("/check-player", async (req, res) => {
             body.server_id = String(server_id);
         }
 
+        if (charname) {
+            body.charname = String(charname);
+        }
+
         const data = await playpay("/check_id", {
             method: "POST",
             body: JSON.stringify(body)
         });
 
+        if (data?.valid === false) {
+            return res.json({
+                success: false,
+                valid: false,
+                player_name: "",
+                data
+            });
+        }
+
         return res.json({
             success: true,
+            valid: true,
+
             player_name:
                 data?.player_name ||
                 data?.nickname ||
                 data?.name ||
-                data?.data?.player_name ||
-                "Akkaunt topildi",
+                "",
+
             data
         });
 
@@ -147,6 +219,7 @@ yakuraRouter.post("/check-player", async (req, res) => {
 
         return res.status(400).json({
             success: false,
+            valid: false,
             error: error.message
         });
     }
@@ -164,28 +237,34 @@ yakuraRouter.post("/create-order", async (req, res) => {
         const {
             game_id,
             package_id,
+            paket_id,
             player_id,
             server_id,
+            charname,
             telegram_user_id
         } = req.body || {};
 
-        if (!game_id || !package_id || !player_id) {
+        const finalPackageId = package_id || paket_id;
+
+        if (!game_id || !finalPackageId || !player_id) {
             return res.status(400).json({
+                success: false,
                 error: "Buyurtma ma'lumotlari to'liq emas"
             });
         }
 
-        /*
-         * PlayPay order.
-         */
         const orderData = {
             game_id: Number(game_id),
-            package_id: Number(package_id),
+            paket_id: Number(finalPackageId),
             player_id: String(player_id)
         };
 
         if (server_id) {
             orderData.server_id = String(server_id);
+        }
+
+        if (charname) {
+            orderData.charname = String(charname);
         }
 
         const result = await playpay("/order", {
@@ -194,9 +273,11 @@ yakuraRouter.post("/create-order", async (req, res) => {
         });
 
         /*
-         * Agar Supabase mavjud bo'lsa,
-         * buyurtmani ham saqlaymiz.
-         */
+        |------------------------------------------------------------------
+        | Supabase'ga saqlash
+        |------------------------------------------------------------------
+        */
+
         try {
             await supabase
                 .from("orders")
@@ -204,11 +285,20 @@ yakuraRouter.post("/create-order", async (req, res) => {
                     telegram_id: telegram_user_id
                         ? String(telegram_user_id)
                         : "unknown",
+
                     product_name:
-                        `Game ${game_id} / Package ${package_id}`,
-                    amount: String(package_id),
-                    price: 0,
+                        `Game ${game_id} / Package ${finalPackageId}`,
+
+                    amount: String(finalPackageId),
+
+                    price:
+                        Number(
+                            result?.price?.amount ||
+                            0
+                        ),
+
                     transaction_last6: "000000",
+
                     status: "pending"
                 });
         } catch (dbError) {
@@ -220,12 +310,36 @@ yakuraRouter.post("/create-order", async (req, res) => {
 
         return res.json({
             success: true,
-            message: "Buyurtma qabul qilindi",
+
+            order_id:
+                result?.order_id ||
+                result?.id ||
+                null,
+
+            status:
+                result?.status ||
+                "processing",
+
+            player_name:
+                result?.player_name ||
+                "",
+
+            price:
+                result?.price?.amount ||
+                0,
+
+            charged:
+                result?.charged?.amount ||
+                0,
+
             order: result
         });
 
     } catch (error) {
-        console.error("Create order error:", error.message);
+        console.error(
+            "Create order error:",
+            error.message
+        );
 
         return res.status(400).json({
             success: false,
