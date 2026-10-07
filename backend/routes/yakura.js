@@ -433,7 +433,64 @@ yakuraRouter.get("/orders", async (req, res) => {
         });
     }
 });
+/*
+|--------------------------------------------------------------------------
+| FOYDALANUVCHI BUYURTMALARI
+|--------------------------------------------------------------------------
+*/
 
+yakuraRouter.get("/my-orders/:telegramId", async (req, res) => {
+    try {
+        const telegramId = String(
+            req.params.telegramId || ""
+        ).trim();
+
+        if (!telegramId) {
+            return res.status(400).json({
+                success: false,
+                error: "Telegram ID kerak"
+            });
+        }
+
+        const { data, error } = await supabase
+            .from("orders")
+            .select(
+                "id, product_name, amount, price, status, created_at"
+            )
+            .eq("telegram_id", telegramId)
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) {
+            console.error(
+                "My orders DB error:",
+                error.message
+            );
+
+            return res.status(500).json({
+                success: false,
+                error: "Buyurtmalarni yuklab bo'lmadi"
+            });
+        }
+
+        return res.json({
+            success: true,
+            orders: data || []
+        });
+
+    } catch (error) {
+        console.error(
+            "My orders error:",
+            error.message
+        );
+
+        return res.status(500).json({
+            success: false,
+            error: "Buyurtmalarni yuklab bo'lmadi"
+        });
+    }
+});
 /*
 |--------------------------------------------------------------------------
 | PLAYPAY BALANCE
