@@ -52,7 +52,32 @@ yakuraRouter.get("/games", async (_req, res) => {
                 ? data
                 : [];
 
-        const result = games.map((game) => ({
+        // Faqat paketlari mavjud o'yinlar
+        const activeGames = games.filter(
+            (game) =>
+                Number(game.packages_count || 0) > 0
+        );
+
+        // Takroriy o'yinlarni nomi bo'yicha olib tashlash
+        const uniqueGames = [];
+        const seen = new Set();
+
+        for (const game of activeGames) {
+            const name = String(
+                game.name || ""
+            ).trim();
+
+            const key = name.toLowerCase();
+
+            if (!name || seen.has(key)) {
+                continue;
+            }
+
+            seen.add(key);
+            uniqueGames.push(game);
+        }
+
+        const result = uniqueGames.map((game) => ({
             id: game.game_id,
             game_id: game.game_id,
 
@@ -60,23 +85,36 @@ yakuraRouter.get("/games", async (_req, res) => {
             title: game.name,
             game_name: game.name,
 
-            id_label: game.id_label || "Player ID",
+            id_label:
+                game.id_label || "Player ID",
 
-            requires_server: Boolean(game.requires_server),
-            requires_charname: Boolean(game.requires_charname),
+            requires_server:
+                Boolean(game.requires_server),
 
-            amount_based: Boolean(game.amount_based),
-            packages_count: Number(game.packages_count || 0),
+            requires_charname:
+                Boolean(game.requires_charname),
 
-            // Frontend uchun fallback
-            image_url: game.image_url || "",
-            icon: game.icon || ""
+            amount_based:
+                Boolean(game.amount_based),
+
+            packages_count:
+                Number(game.packages_count || 0),
+
+            // Hozircha PlayPay'dan kelmasa bo'sh
+            image_url:
+                game.image_url || "",
+
+            icon:
+                game.icon || ""
         }));
 
         return res.json(result);
 
     } catch (error) {
-        console.error("Games error:", error.message);
+        console.error(
+            "Games error:",
+            error.message
+        );
 
         return res.status(500).json({
             error: "O'yinlarni yuklab bo'lmadi",
