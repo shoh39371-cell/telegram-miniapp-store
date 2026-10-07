@@ -112,30 +112,53 @@ yakuraRouter.get("/games/:gameId/packages", async (req, res) => {
                 ? data
                 : [];
 
-        const result = packages.map((item) => ({
-            id: item.paket_id,
-            paket_id: item.paket_id,
-
-            name: item.name,
-
-            price:
+        const result = packages.map((item) => {
+            const charged = Number(
+                item?.charged?.amount ??
                 item?.price?.amount ??
                 item?.price ??
-                0,
+                0
+            );
 
-            charged:
-                item?.charged?.amount ??
-                0,
+            const markupRate =
+                charged < 50000 ? 0.05 : 0.08;
 
-            currency:
-                item?.price?.currency ||
-                "UZS"
-        }));
+            const markupAmount = Math.round(
+                charged * markupRate
+            );
+
+            const customerPrice =
+                charged + markupAmount;
+
+            return {
+                id: item.paket_id,
+                paket_id: item.paket_id,
+
+                name: item.name,
+
+                base_price: charged,
+
+                markup_percent:
+                    markupRate * 100,
+
+                markup_amount:
+                    markupAmount,
+
+                price: customerPrice,
+
+                charged: charged,
+
+                currency: "UZS"
+            };
+        });
 
         return res.json(result);
 
     } catch (error) {
-        console.error("Packages error:", error.message);
+        console.error(
+            "Packages error:",
+            error.message
+        );
 
         return res.status(500).json({
             error: "Paketlarni yuklab bo'lmadi",
