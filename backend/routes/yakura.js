@@ -376,43 +376,39 @@ yakuraRouter.post("/create-order", async (req, res) => {
 |--------------------------------------------------------------------------
 */
 
-yakuraRouter.get("/orders", async (req, res) => {
+yakuraRouter.get("/my-orders/:telegramId", async (req, res) => {
     try {
-        const telegramUserId = String(
-            req.query.telegram_user_id || ""
+        const telegramId = String(
+            req.params.telegramId || ""
         ).trim();
 
-        if (!telegramUserId) {
+        if (!telegramId) {
             return res.status(400).json({
                 success: false,
-                error: "telegram_user_id kerak"
+                error: "Telegram ID kerak"
             });
         }
 
         const { data, error } = await supabase
             .from("orders")
-            .select(`
-                id,
-                product_name,
-                amount,
-                price,
-                status,
-                created_at
-            `)
-            .eq("telegram_id", telegramUserId)
+            .select(
+                "id, product_name, amount, price, status, created_at"
+            )
+            .eq("telegram_id", telegramId)
             .order("created_at", {
                 ascending: false
             });
 
         if (error) {
             console.error(
-                "Orders fetch error:",
+                "MY ORDERS SUPABASE ERROR:",
                 error.message
             );
 
             return res.status(500).json({
                 success: false,
-                error: "Buyurtmalarni yuklab bo'lmadi"
+                error: "Buyurtmalarni yuklab bo'lmadi",
+                details: error.message
             });
         }
 
@@ -423,13 +419,14 @@ yakuraRouter.get("/orders", async (req, res) => {
 
     } catch (error) {
         console.error(
-            "Orders error:",
+            "MY ORDERS ERROR:",
             error.message
         );
 
         return res.status(500).json({
             success: false,
-            error: "Server xatosi"
+            error: "Buyurtmalarni yuklab bo'lmadi",
+            details: error.message
         });
     }
 });
@@ -511,72 +508,6 @@ yakuraRouter.get("/playpay-balance", async (_req, res) => {
 
         return res.status(500).json({
             error: error.message
-        });
-    }
-});
-/*
-|--------------------------------------------------------------------------
-| MENING BUYURTMALARIM
-|--------------------------------------------------------------------------
-*/
-
-yakuraRouter.get("/my-orders/:telegramId", async (req, res) => {
-    try {
-        const telegramId = String(
-            req.params.telegramId || ""
-        ).trim();
-
-        if (!telegramId) {
-            return res.status(400).json({
-                success: false,
-                error: "telegramId kerak"
-            });
-        }
-
-        const { data, error } = await supabase
-            .from("orders")
-            .select("*")
-            .eq("telegram_id", telegramId);
-
-        if (error) {
-            console.error(
-                "MY ORDERS SUPABASE ERROR:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                error: "Buyurtmalarni yuklab bo'lmadi",
-                details: error.message
-            });
-        }
-
-        const orders = Array.isArray(data)
-            ? data
-            : [];
-
-        orders.sort((a, b) => {
-            return (
-                new Date(b.created_at || 0) -
-                new Date(a.created_at || 0)
-            );
-        });
-
-        return res.json({
-            success: true,
-            orders: orders
-        });
-
-    } catch (error) {
-        console.error(
-            "MY ORDERS ERROR:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            error: "Buyurtmalarni yuklab bo'lmadi",
-            details: error.message
         });
     }
 });
