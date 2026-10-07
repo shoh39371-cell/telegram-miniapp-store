@@ -743,16 +743,73 @@ document
     );
 
 
+async function showMyOrders() {
+
+    const telegramUserId =
+        tg?.initDataUnsafe?.user?.id;
+
+    if (!telegramUserId) {
+        alert(
+            "Telegram foydalanuvchisi aniqlanmadi."
+        );
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API}/order/${telegramUserId}`
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Buyurtmalarni yuklab bo'lmadi"
+            );
+        }
+
+        const orders =
+            data.orders || [];
+
+        if (!orders.length) {
+            alert(
+                "Sizda hali buyurtmalar mavjud emas."
+            );
+            return;
+        }
+
+        const text =
+            orders.map(
+                (order, index) => {
+
+                    return `${index + 1}. ${order.product_name}
+💰 ${formatPrice(order.price)} so'm
+📌 ${order.status}`;
+                }
+            ).join("\n\n");
+
+        alert(text);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message ||
+            "Buyurtmalarni yuklashda xatolik."
+        );
+    }
+}
+
+
 document
     .getElementById("ordersButton")
     ?.addEventListener(
         "click",
-        () => {
-
-            alert(
-                "Buyurtmalar bo'limi tez orada ishga tushadi."
-            );
-        }
+        showMyOrders
     );
 
 
@@ -760,12 +817,7 @@ document
     .getElementById("ordersNav")
     ?.addEventListener(
         "click",
-        () => {
-
-            alert(
-                "Buyurtmalar bo'limi tez orada ishga tushadi."
-            );
-        }
+        showMyOrders
     );
 
 
