@@ -758,7 +758,7 @@ async function showMyOrders() {
     try {
 
         const response = await fetch(
-            `${API}/order/${telegramUserId}`
+            `${API}/my-orders/${telegramUserId}`
         );
 
         const data =
