@@ -370,7 +370,69 @@ yakuraRouter.post("/create-order", async (req, res) => {
         });
     }
 });
+/*
+|--------------------------------------------------------------------------
+| BUYURTMALARIM
+|--------------------------------------------------------------------------
+*/
 
+yakuraRouter.get("/orders", async (req, res) => {
+    try {
+        const telegramUserId = String(
+            req.query.telegram_user_id || ""
+        ).trim();
+
+        if (!telegramUserId) {
+            return res.status(400).json({
+                success: false,
+                error: "telegram_user_id kerak"
+            });
+        }
+
+        const { data, error } = await supabase
+            .from("orders")
+            .select(`
+                id,
+                product_name,
+                amount,
+                price,
+                status,
+                created_at
+            `)
+            .eq("telegram_id", telegramUserId)
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) {
+            console.error(
+                "Orders fetch error:",
+                error.message
+            );
+
+            return res.status(500).json({
+                success: false,
+                error: "Buyurtmalarni yuklab bo'lmadi"
+            });
+        }
+
+        return res.json({
+            success: true,
+            orders: data || []
+        });
+
+    } catch (error) {
+        console.error(
+            "Orders error:",
+            error.message
+        );
+
+        return res.status(500).json({
+            success: false,
+            error: "Server xatosi"
+        });
+    }
+});
 
 /*
 |--------------------------------------------------------------------------
