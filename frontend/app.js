@@ -87,104 +87,80 @@ async function loadGames() {
 ========================= */
 
 function renderGames(list) {
-
     if (!gamesContainer) return;
 
     if (!list.length) {
-
         gamesContainer.innerHTML = `
             <div class="loading-card">
                 O'yinlar topilmadi.
             </div>
         `;
-
         return;
     }
 
-    gamesContainer.innerHTML =
-        list.map((game, index) => {
+    gamesContainer.innerHTML = list.map((game, index) => {
+        const id =
+            game.id ??
+            game.game_id ??
+            game.code ??
+            index;
 
-            const id =
-                game.id ??
-                game.game_id ??
-                game.code ??
-                index;
+        const name =
+            game.name ??
+            game.title ??
+            game.game_name ??
+            "O'yin";
 
-            const name =
-                game.name ??
-                game.title ??
-                game.game_name ??
-                "O'yin";
+        const image =
+            game.image_url ??
+            game.image ??
+            game.icon ??
+            "";
 
-            const icon =
-                game.icon ??
-                game.image ??
-                game.logo ??
-                "🎮";
+        return `
+            <button
+                class="game-card"
+                data-game-id="${escapeHtml(String(id))}"
+            >
 
-            return `
-                <button
-                    class="game-card"
-                    data-game-id="${escapeHtml(String(id))}"
-                >
-
-                    <div class="game-icon">
-                        ${
-                            String(icon).startsWith("http")
-                                ? `<img src="${escapeHtml(icon)}" alt="">`
-                                : escapeHtml(icon)
-                        }
-                    </div>
-
-                    <div class="game-info">
-
-                        <strong>
-                            ${escapeHtml(name)}
-                        </strong>
-
-                        <small>
-                            Donat qilish
-                        </small>
-
-                    </div>
-
-                    <span class="game-arrow">
-                        ›
-                    </span>
-
-                </button>
-            `;
-
-        }).join("");
-
-    document
-        .querySelectorAll(".game-card")
-        .forEach(card => {
-
-            card.addEventListener(
-                "click",
-                () => {
-
-                    const id =
-                        card.dataset.gameId;
-
-                    const game =
-                        games.find(g =>
-                            String(
-                                g.id ??
-                                g.game_id ??
-                                g.code
-                            ) === String(id)
-                        );
-
-                    if (game) {
-                        openGame(game);
+                <div class="game-icon">
+                    ${
+                        image
+                            ? `<img
+                                src="${escapeHtml(image)}"
+                                alt="${escapeHtml(name)}"
+                                loading="lazy"
+                              >`
+                            : `<span>🎮</span>`
                     }
+                </div>
 
-                }
+                <div class="game-info">
+                    <strong>${escapeHtml(name)}</strong>
+                    <small>Donat qilish</small>
+                </div>
+
+                <span class="game-arrow">›</span>
+
+            </button>
+        `;
+    }).join("");
+
+    document.querySelectorAll(".game-card").forEach(card => {
+        card.addEventListener("click", () => {
+            const id = card.dataset.gameId;
+
+            const game = games.find(g =>
+                String(
+                    g.id ??
+                    g.game_id ??
+                    g.code
+                ) === String(id)
             );
 
+            if (game) openGame(game);
         });
+    });
 }
 
 
